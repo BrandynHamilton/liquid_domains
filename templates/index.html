@@ -118,6 +118,15 @@
             fetch('/api/visualizations')
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Data fetched from API:', data);  // Log the fetched data
+                    
+                    // Ensure the data has the expected structure
+                    console.log('Cumulative Sales Chart:', data.cumulative_sales_chart);
+                    console.log('MA Plot:', data.ma_plot);
+                    console.log('Sold Domains Fig:', data.sold_domains_fig);
+                    console.log('Rolling Avg Plot:', data.rolling_avg_plot);
+
+                    // Plotting charts
                     Plotly.newPlot('cumulative_sales_chart', JSON.parse(data.cumulative_sales_chart).data, JSON.parse(data.cumulative_sales_chart).layout);
                     Plotly.newPlot('ma_plot', JSON.parse(data.ma_plot).data, JSON.parse(data.ma_plot).layout);
                     Plotly.newPlot('sold_domains_fig', JSON.parse(data.sold_domains_fig).data, JSON.parse(data.sold_domains_fig).layout);
