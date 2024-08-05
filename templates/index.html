@@ -11,15 +11,20 @@
             color: #333;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             height: 100vh;
+            margin: 0;
+            overflow-y: auto;
+            padding: 20px;
         }
         .container {
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 80%;
+            max-width: 1000px;
+            margin-top: 20px;
         }
         .container h1 {
             font-size: 24px;
@@ -40,12 +45,31 @@
             border-radius: 4px;
             color: #fff;
             font-size: 16px;
+            cursor: pointer;
+        }
+        .container button:hover {
+            background-color: #0056b3;
         }
         .container .result {
             margin-top: 20px;
             font-size: 18px;
         }
+        .chart-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        .chart-container .chart {
+            background-color: #fff;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            padding: 10px;
+            width: 100%; /* Use the full width for charts */
+        }
     </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -53,6 +77,14 @@
         <input type="text" id="domain" placeholder="Enter domain name">
         <button onclick="evaluateDomain()">Evaluate</button>
         <div class="result" id="result"></div>
+        
+        <div class="chart-container">
+            <h2>Dataset Metrics</h2>
+            <div class="chart" id="cumulative_sales_chart"></div>
+            <div class="chart" id="ma_plot"></div>
+            <div class="chart" id="sold_domains_fig"></div>
+            <div class="chart" id="rolling_avg_plot"></div>
+        </div>
     </div>
 
     <script>
@@ -78,6 +110,24 @@
                 console.error('Error:', error);
             });
         }
+        
+        function fetchVisualizations() {
+            fetch('/api/visualizations')
+                .then(response => response.json())
+                .then(data => {
+                    Plotly.newPlot('cumulative_sales_chart', JSON.parse(data.cumulative_sales_chart).data, JSON.parse(data.cumulative_sales_chart).layout);
+                    Plotly.newPlot('ma_plot', JSON.parse(data.ma_plot).data, JSON.parse(data.ma_plot).layout);
+                    Plotly.newPlot('sold_domains_fig', JSON.parse(data.sold_domains_fig).data, JSON.parse(data.sold_domains_fig).layout);
+                    Plotly.newPlot('rolling_avg_plot', JSON.parse(data.rolling_avg_plot).data, JSON.parse(data.rolling_avg_plot).layout);
+                })
+                .catch(error => {
+                    console.error('Error fetching visualizations:', error);
+                });
+        }
+
+        window.onload = () => {
+            fetchVisualizations();
+        };
     </script>
 </body>
 </html>
