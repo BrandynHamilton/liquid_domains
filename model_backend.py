@@ -24,12 +24,41 @@ from scripts import Prophet_Domain_Valuator, ridge_domain_valuator, randomforres
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-prophet_model =
-rf_model =
-ridge_model =
-prophet_features =
+def model():
 
-domain_valuation_model = EnsemblePredictor(prophet_model, rf_model, ridge_model, prophet_features)
+prophet_model, prophet_features = train_prophet_model(prophet_features)
+
+# %%
+ridge_model, ridge_features = train_ridge_model(X, y)
+
+# %%
+randomforest_model, random_forest_features = train_randomforest_model(X, y)
+
+prophet_valuator = Prophet_Domain_Valuator(domain, prophet_features, prophet_features_data)
+
+# Prepare the model and get the domain value
+prophet_valuator.model_prep()
+prophet_domain_value = prophet_valuator.value_domain(prophet_model)
+
+ridge_valuator = Domain_Valuator(domain, X, y, gen_features, features_data, seed)
+
+# Prepare the model and get the domain value
+ridge_valuator.model_prep()
+ridge_domain_value = ridge_valuator.value_domain(ridge_model)
+
+randomforest_valuator = Domain_Valuator(domain, X, y, gen_features, features_data, seed)
+
+# Prepare the model and get the domain value
+randomforest_valuator.model_prep()
+randomforest_domain_value = randomforest_valuator.value_domain(randomforest_model)
+
+individual_predictions = [
+    prophet_domain_value,
+    ridge_domain_value,
+    randomforest_domain_value
+]
+
+ensemble_domain_value = np.mean(individual_predictions)
 
 scheduler = BackgroundScheduler()
 
