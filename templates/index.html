@@ -90,10 +90,13 @@
     <script>
         function evaluateDomain() {
             const domain = document.getElementById('domain').value;
+            const apiKey = 'superhack2024';  // Replace 'YOUR_API_KEY' with your actual API key
+
             fetch('/api/evaluate', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`  // Include the API key in the Authorization header
                 },
                 body: JSON.stringify({ domain: domain })
             })

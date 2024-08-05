@@ -35,6 +35,15 @@ from vizualizations import create_visualizations
 
 pd.options.display.float_format = '{:,.2f}'.format
 
+API_KEY = os.getenv('FRONTEND_API_KEY')
+print(f'api key: {API_KEY}')
+
+def check_api_key(request):
+    api_key = request.headers.get('Authorization')
+    if api_key is None or api_key != f'Bearer {API_KEY}':
+        return False
+    return True
+
 # Create Flask app
 def create_app():
     app = Flask(__name__)
@@ -53,7 +62,7 @@ def create_app():
         global historical_data
         new_data = pd.DataFrame([live_comp])
         historical_data = pd.concat([historical_data, new_data]).reset_index(drop=True)
-        historical_data.drop_duplicates(subset='dt', keep='last', inplace=True)
+        historical_data.drop_duplicates(subset='domain', keep='last', inplace=True)
         cache.set('historical_data', historical_data)
 
     def train_model():
@@ -100,6 +109,11 @@ def create_app():
 
     @app.route('/api/evaluate', methods=['POST'])
     def evaluate():
+        # Check for the API key
+        api_key = request.headers.get('Authorization')
+        if api_key != f'Bearer {API_KEY}':
+            return jsonify({'error': 'Unauthorized'}), 401
+
         data = request.get_json()
         domain = data.get('domain')
         if not domain:
