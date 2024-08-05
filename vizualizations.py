@@ -101,7 +101,7 @@ def create_visualizations(combined_dataset):
             go.Scatter(
                 x=daily_sales_aggregate.index,
                 y=daily_sales_aggregate['7d_sales_volume'],
-                name='7d_sales_volume',
+                name='7d Sales Volume',
                 stackgroup='one'
             ),
             secondary_y=False
@@ -110,7 +110,7 @@ def create_visualizations(combined_dataset):
             go.Scatter(
                 x=daily_sales_aggregate.index,
                 y=daily_sales_aggregate['30d_sales_volume'],
-                name='30d_sales_volume',
+                name='30d Sales Volume',
                 stackgroup='one'
             ),
             secondary_y=False
@@ -362,7 +362,7 @@ def create_visualizations(combined_dataset):
     sold_domains_fig_json = pio.to_json(sold_domains_fig)
     rolling_avg_plot_json = pio.to_json(rolling_avg_plot)
 
-    return cumulative_sales_chart, ma_plot, sold_domains_fig, rolling_avg_plot
+    return cumulative_sales_chart_json, ma_plot_json, sold_domains_fig_json, rolling_avg_plot_json
 
 
 
