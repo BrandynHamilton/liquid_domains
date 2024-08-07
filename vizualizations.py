@@ -64,10 +64,11 @@ def create_visualizations(combined_dataset):
     # Calculate cumulative metrics
     daily_sales_aggregate['cumulative_sum_sales_volume'] = daily_sales_aggregate['daily_sales_vol'].cumsum()
     daily_sales_aggregate['cumulative_rolling_avg_price'] = daily_sales_aggregate['daily_sales_vol'].expanding().mean()
+    daily_sales_aggregate['cumulative_sales'] = daily_sales_aggregate['daily_sales'].cumsum()
 
     # %%
     temporals = ['7d_rolling_avg_price','30d_rolling_avg_price','7d_sales_volume','30d_sales_volume','cumulative_rolling_avg_price','7d_domains_sold','30d_domains_sold','7d_rolling_std_dev','30d_rolling_std_dev']
-    cumulatives = ['cumulative_sum_sales_volume','cumulative_rolling_avg_price']
+    cumulatives = ['cumulative_sum_sales_volume','cumulative_rolling_avg_price','cumulative_sales']
 
     # %%
     top_250 = daily_sales_aggregate.head(250)
@@ -84,6 +85,17 @@ def create_visualizations(combined_dataset):
         ),
         secondary_y=False
     )
+
+    cumulative_sales_chart.add_trace(
+        go.Scatter(
+            x=daily_sales_aggregate.index,
+            y=daily_sales_aggregate['cumulative_sales'],
+            name='cumulative_sales',
+            mode='lines'
+        ),
+        secondary_y=True
+    )
+
     cumulative_sales_chart.update_layout(
         title='Cumulative Sales Volume',
         # barmode='group'  # Set the bar mode to either 'group' for side-by-side or 'stack' for stacked

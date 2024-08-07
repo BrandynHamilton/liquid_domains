@@ -1,3 +1,8 @@
 scaffold-op/
 liquid_domains_env/
+node_modules/
+.ipynb_checkpoints/
+smart-contract-examples/
+npx_variables.txt
 .env
+*.pkl

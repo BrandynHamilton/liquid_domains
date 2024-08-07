@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚒️ Mint a Liquid Domain</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1000px;
+            margin-top: 20px;
+        }
+        .container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .container a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .container a:hover {
+            text-decoration: underline;
+        }
+        .container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px; /* Add margin to space out the button from the text input */
+        }
+        .container button:hover {
+            background-color: #0056b3;
+        }
+        .container .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .container .chart-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        .container .chart-container .chart {
+            background-color: #fff;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            padding: 10px;
+            width: 100%; /* Use the full width for charts */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #mints {
+            margin-top: 20px;
+        }
+        .mint-item {
+            margin-bottom: 10px;
+        }
+        .mint-item a {
+            text-decoration: none;
+            color: blue;
+        }
+        .mint-item a:hover {
+            text-decoration: underline;
+        }
+        .mint-item img {
+            width: 20px; /* Adjust size as needed */
+            height: 20px;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚒️ Mint a Liquid Domain</h1>
+        
+        <!-- Home Link -->
+        <a href="/">Home</a>
+        
+        <button id="connectWallet">Connect Wallet</button>
+        <div id="walletAddress"></div> <!-- Moved this element here -->
+
+        <!-- Portfolio and domain information -->
+        <h2>Total Portfolio Value</h2>
+        <div id="portfolioValue"></div>
+        <h2>Domain Values</h2>
+        <div id="domainValues"></div>
+        
+        <!-- Mints section -->
+        <h2>Mints</h2>
+        <input type="text" id="uriInput" placeholder="Enter Metadata URI" />
+        <button id="mintNFT">Mint NFT</button>
+
+        <!-- Mints list -->
+        <div id="mints">
+            <ul id="mintList">
+                <!-- Mint items will be appended here -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let web3;
+        let accounts;
+
+        document.getElementById('connectWallet').addEventListener('click', async () => {
+            if (window.ethereum) {
+                try {
+                    web3 = new Web3(window.ethereum);
+                    accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    document.getElementById('walletAddress').innerText = 'Connected Wallet: ' + accounts[0];
+                    getWalletValue(accounts[0]);
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                alert('Please install MetaMask!');
+            }
+        });
+
+        document.getElementById('mintNFT').addEventListener('click', async () => {
+            if (web3 && accounts) {
+                const uri = document.getElementById('uriInput').value;
+                if (!uri) {
+                    alert('Please enter a metadata URI!');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/mint', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ account: accounts[0], uri: uri }),
+                    });
+                    const data = await response.json();
+                    const mintList = document.getElementById('mintList');
+                    if (data.transactionHash) {
+                        // Create a new list item for the mint
+                        const mintItem = document.createElement('li');
+                        mintItem.className = 'mint-item';
+                        mintItem.innerHTML = `
+                            Domain: ${uri} - 
+                            Transaction Hash: <a href="https://optimism-sepolia.blockscout.com/tx/${data.transactionHash}" target="_blank">${data.transactionHash}</a>
+                            <img src="/static/img/Color_BS_symbol.png" alt="Logo">
+                        `;
+                        mintList.appendChild(mintItem);
+                    } else {
+                        alert('Minted successfully! Refresh page to see value.');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('An error occurred. Check the console for details.');
+                }
+            } else {
+                alert('Please connect your wallet first!');
+            }
+        });
+
+        async function getWalletValue(account) {
+            try {
+                // Fetch domain and value information
+                const response = await fetch('/api/domain_values', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ account: account }),
+                });
+                const data = await response.json();
+                
+                document.getElementById('portfolioValue').innerText = 'Total Portfolio Value: ' + data.totalValue;
+
+                // Display domain values
+                const domainValuesElement = document.getElementById('domainValues');
+                domainValuesElement.innerHTML = '';
+                data.domains.forEach(domainInfo => {
+                    const div = document.createElement('div');
+                    div.innerText = 'Domain: ' + domainInfo.domain + ', Value: ' + domainInfo.value;
+                    domainValuesElement.appendChild(div);
+                });
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,1 +1,11 @@
-curl -X POST http://localhost:5555/api/evaluate -H "Content-Type: application/json" -H "Authorization: Bearer superhack2024" -d "{\"domain\": \"example.com\"}"
+curl -X POST "https://9be52d977a2c.ngrok.app/api/evaluate" -H "Content-Type: application/json" -d "{\"domain\": \"test.finance\", \"api_key\": \"superhack2024\"}"
+
+curl -X POST "http://localhost:5555/api/evaluate" -H "Content-Type: application/json" -d "{\"domain\": \"test.finance\", \"api_key\": \"superhack2024\"}"
+
+curl -X POST "http://127.0.0.1:5555/api/evaluate" -H "Content-Type: application/json" -d "{\"domain\": \"test.finance\", \"api_key\": \"superhack2024\"}"
+
+curl -X POST "http://127.0.0.1:8080/api/evaluate" -H "Content-Type: application/json" -d "{\"domain\": \"test.finance\", \"api_key\": \"superhack2024\"}"
+
+curl -X POST "https://910379bfa0ad.ngrok.app/api/evaluate" -H "Content-Type: application/json" -d "{\"domain\": \"test.finance\", \"api_key\": \"superhack2024\"}"
+
+curl -X POST "https://www.optimizerfinance.com/api/evaluate" -H "Content-Type: application/json" -d "{\"domain\": \"test.finance\", \"api_key\": \"superhack2024\"}"
