@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domain Valuator</title>
+    <title>🌐 Liquid Domains</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,6 +19,7 @@
         }
         .container {
             background-color: #fff;
+            justify-content: center;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -68,16 +69,44 @@
             padding: 10px;
             width: 100%; /* Use the full width for charts */
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Domain Valuator</h1>
+        <h1>🌐 Liquid Domains</h1>
+        <a href="/mint">Mint</a>
         <input type="text" id="domain" placeholder="Enter domain name">
         <button onclick="evaluateDomain()">Evaluate</button>
         <div class="result" id="result"></div>
         
+        <h2>Latest Valuations</h2>
+        <table id="valuations_table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Domain</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+    
         <div class="chart-container">
             <h2>Dataset Metrics</h2>
             <div class="chart" id="cumulative_sales_chart"></div>
@@ -85,20 +114,21 @@
             <div class="chart" id="sold_domains_fig"></div>
             <div class="chart" id="rolling_avg_plot"></div>
         </div>
+
+        
     </div>
 
     <script>
         function evaluateDomain() {
             const domain = document.getElementById('domain').value;
-            const apiKey = 'superhack2024';  // Replace 'YOUR_API_KEY' with your actual API key
-
+            const apiKey = 'superhack2024';  // Your API key
+    
             fetch('/api/evaluate', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`  // Include the API key in the Authorization header
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ domain: domain })
+                body: JSON.stringify({ domain: domain, api_key: apiKey })  // Include API key in the body
             })
             .then(response => response.json())
             .then(data => {
@@ -125,7 +155,7 @@
                     console.log('MA Plot:', data.ma_plot);
                     console.log('Sold Domains Fig:', data.sold_domains_fig);
                     console.log('Rolling Avg Plot:', data.rolling_avg_plot);
-
+    
                     // Plotting charts
                     Plotly.newPlot('cumulative_sales_chart', JSON.parse(data.cumulative_sales_chart).data, JSON.parse(data.cumulative_sales_chart).layout);
                     Plotly.newPlot('ma_plot', JSON.parse(data.ma_plot).data, JSON.parse(data.ma_plot).layout);
@@ -136,10 +166,33 @@
                     console.error('Error fetching visualizations:', error);
                 });
         }
-
+    
+        function fetchLatestValuations() {
+            fetch('/api/latest_valuations')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#valuations_table tbody');
+                    tableBody.innerHTML = '';  // Clear any existing rows
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.dt}</td>
+                            <td>${row.domain}</td>
+                            <td>${row.value}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching latest valuations:', error);
+                });
+        }
+    
         window.onload = () => {
             fetchVisualizations();
+            fetchLatestValuations();
         };
     </script>
+    
 </body>
 </html>
