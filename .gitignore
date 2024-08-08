@@ -3,6 +3,9 @@ liquid_domains_env/
 node_modules/
 .ipynb_checkpoints/
 smart-contract-examples/
-npx_variables.txt
+erc_721_remix/
+notes/deployed_addresses.txt
+notes/npx_variables.txt
+metadata.db
 .env
 *.pkl

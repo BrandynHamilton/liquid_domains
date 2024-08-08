@@ -69,6 +69,13 @@
             padding: 10px;
             width: 100%; /* Use the full width for charts */
         }
+        select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -106,16 +113,22 @@
                 <!-- Data will be inserted here by JavaScript -->
             </tbody>
         </table>
-    
+
+        <h2>Dataset Metrics</h2>
+        <select id="time_frame" onchange="fetchVisualizations()">
+            <option value="all_time">All Time</option>
+            <option value="7_days">Last 7 Days</option>
+            <option value="30_days">Last 30 Days</option>
+            <option value="180_days">Last 180 Days</option>
+            <option value="365_days">Last 365 Days</option>
+        </select>
+
         <div class="chart-container">
-            <h2>Dataset Metrics</h2>
             <div class="chart" id="cumulative_sales_chart"></div>
             <div class="chart" id="ma_plot"></div>
             <div class="chart" id="sold_domains_fig"></div>
             <div class="chart" id="rolling_avg_plot"></div>
         </div>
-
-        
     </div>
 
     <script>
@@ -145,7 +158,9 @@
         }
         
         function fetchVisualizations() {
-            fetch('/api/visualizations')
+            const timeFrame = document.getElementById('time_frame').value;
+
+            fetch(`/api/visualizations?time_frame=${timeFrame}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log('Data fetched from API:', data);  // Log the fetched data

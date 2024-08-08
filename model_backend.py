@@ -144,14 +144,14 @@ def create_app():
     historical_data = cache.get('historical_data', pd.DataFrame())
 
     # Load models
-    global prophet_model, ridge_model, randomforest_model, cumulative_sales_chart, ma_plot, sold_domains_fig, rolling_avg_plot
+    global prophet_model, ridge_model, randomforest_model, cumulative_sales_chart, ma_plot, sold_domains_fig, rolling_avg_plot, combined_dataset
 
     prophet_model = joblib.load('prophet_model.pkl')
     ridge_model = joblib.load('ridge_model.pkl')
     randomforest_model = joblib.load('randomforest_model.pkl')
 
     X, y, prophet_features, gen_features, target, combined_dataset, features = process_data()
-    cumulative_sales_chart, ma_plot, sold_domains_fig, rolling_avg_plot = create_visualizations(combined_dataset)
+    # cumulative_sales_chart, ma_plot, sold_domains_fig, rolling_avg_plot = create_visualizations(combined_dataset)
 
 
     @app.route('/')
@@ -181,11 +181,16 @@ def create_app():
 
     @app.route('/api/visualizations', methods=['GET'])
     def visualizations():
+        global combined_dataset
+        time_frame = request.args.get('time_frame', 'all')  # Default to 'all' if not provided
+        print(f'timeframe {time_frame}')
+        print(f'combined_data: {combined_dataset}')
+        filtered_charts = create_visualizations(combined_dataset, time_frame)
         cached_data = {
-            "cumulative_sales_chart": cumulative_sales_chart,
-            "ma_plot": ma_plot,
-            "sold_domains_fig": sold_domains_fig,
-            "rolling_avg_plot": rolling_avg_plot
+            "cumulative_sales_chart": filtered_charts[0],
+            "ma_plot": filtered_charts[1],
+            "sold_domains_fig": filtered_charts[2],
+            "rolling_avg_plot": filtered_charts[3]
         }
         return jsonify(cached_data)
 
@@ -368,10 +373,10 @@ def main(domain, prophet_model, ridge_model, randomforest_model, combined_datase
     seed = 20
     set_random_seed(seed)
 
-    graph_json_1 = json.dumps(cumulative_sales_chart, cls=PlotlyJSONEncoder)
-    graph_json_2 = json.dumps(ma_plot, cls=PlotlyJSONEncoder)
-    graph_json_3 = json.dumps(sold_domains_fig, cls=PlotlyJSONEncoder)
-    graph_json_4 = json.dumps(rolling_avg_plot, cls=PlotlyJSONEncoder)
+    # graph_json_1 = json.dumps(cumulative_sales_chart, cls=PlotlyJSONEncoder)
+    # graph_json_2 = json.dumps(ma_plot, cls=PlotlyJSONEncoder)
+    # graph_json_3 = json.dumps(sold_domains_fig, cls=PlotlyJSONEncoder)
+    # graph_json_4 = json.dumps(rolling_avg_plot, cls=PlotlyJSONEncoder)
 
     prophet_features_data = combined_dataset.copy()
     prophet_features_data.rename(columns={"dt": "ds", "price_usd": "y"}, inplace=True)
