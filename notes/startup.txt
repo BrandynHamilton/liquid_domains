@@ -1,0 +1,4 @@
+ngrok start --all # Gets all channels running
+liquid_domains_env\scripts\activate # python env  
+Chainlink index.js
+Yarn/NPM/Hardhat

@@ -15,20 +15,33 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 # %%
+def filter_data_by_time_frame(dataset, time_frame):
+    end_date = dataset.index.max()
+    
+    if time_frame == '7d':
+        start_date = end_date - pd.DateOffset(days=7)
+    elif time_frame == '30d':
+        start_date = end_date - pd.DateOffset(days=30)
+    elif time_frame == '180d':
+        start_date = end_date - pd.DateOffset(days=180)
+    elif time_frame == '365d':
+        start_date = end_date - pd.DateOffset(days=365)
+    else:  # 'all'
+        start_date = dataset.index.min()
+    
+    return dataset[(dataset.index >= start_date) & (dataset.index <= end_date)]
 
-def create_visualizations(combined_dataset):
+
+def create_visualizations(data, time_frame='all'):
+    print(f'data: {data}')
     # %%
-    combined_dataset.columns
-
-
-
-
+    data = filter_data_by_time_frame(data, time_frame)
 
     # %% [markdown]
     # # Add web2 vs web3 identifier by data source for marketplace
 
     # %%
-    viz_data = combined_dataset.copy()
+    viz_data = data.copy()
     print(f'viz data: {viz_data.head()} \n{viz_data.tail()}')
 
     # %%
@@ -341,38 +354,45 @@ def create_visualizations(combined_dataset):
     # 
 
     # %%
+    def rolling_avg_plot(df):
+        rolling_avg_plot = make_subplots(specs=[[{"secondary_y": True}]])
+            
+        rolling_avg_plot.add_trace(
+            go.Scatter(
+                x=df.index,
+                y=df['7d_rolling_avg_price'],
+                name='7d rolling avg price',
+                stackgroup='one'
+            ),
+            secondary_y=False
+        )
+        rolling_avg_plot.add_trace(
+            go.Scatter(
+                x=df.index,
+                y=df['30d_rolling_avg_price'],
+                name='30d rolling avg price',
+                stackgroup='one'
+            ),
+            secondary_y=False
+        )
+        rolling_avg_plot.update_layout(
+            title='7d and 30d rolling avg prices',
+            # barmode='group'  # Set the bar mode to either 'group' for side-by-side or 'stack' for stacked
+        )
 
-    rolling_avg_plot = make_subplots(specs=[[{"secondary_y": True}]])
-        
-    rolling_avg_plot.add_trace(
-        go.Scatter(
-            x=daily_sales_aggregate.index,
-            y=daily_sales_aggregate['7d_rolling_avg_price'],
-            name='7d rolling avg price',
-            stackgroup='one'
-        ),
-        secondary_y=False
-    )
-    rolling_avg_plot.add_trace(
-        go.Scatter(
-            x=daily_sales_aggregate.index,
-            y=daily_sales_aggregate['30d_rolling_avg_price'],
-            name='30d rolling avg price',
-            stackgroup='one'
-        ),
-        secondary_y=False
-    )
-    rolling_avg_plot.update_layout(
-        title='7d and 30d rolling avg prices',
-        # barmode='group'  # Set the bar mode to either 'group' for side-by-side or 'stack' for stacked
-    )
+        rolling_avg_plot.update_xaxes(title_text="Date")
+        return rolling_avg_plot
 
-    rolling_avg_plot.update_xaxes(title_text="Date")
+    
+     # Generate the charts based on the filtered data
+    rolling_avg_fig = rolling_avg_plot(daily_sales_aggregate)  # Call function to get Plotly figure
+
+    
 
     cumulative_sales_chart_json = pio.to_json(cumulative_sales_chart)
     ma_plot_json = pio.to_json(ma_plot)
     sold_domains_fig_json = pio.to_json(sold_domains_fig)
-    rolling_avg_plot_json = pio.to_json(rolling_avg_plot)
+    rolling_avg_plot_json = pio.to_json(rolling_avg_fig)
 
     return cumulative_sales_chart_json, ma_plot_json, sold_domains_fig_json, rolling_avg_plot_json
 
