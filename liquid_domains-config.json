@@ -1,0 +1,27 @@
+{
+    "version": "1",
+    "name": "liquiddomains",
+    "abis": {
+      "LD-Optimism": {
+        "path": "./consumer-abi.json"
+      },
+      "LD-Base": {
+        "path": "./consumer-abi.json"
+      }
+    },
+    "instances": [
+      {
+        "abi": "LD-Optimism",
+        "address": "0x3E6f168587f9721A31f2FA1a560e6ab36d3B8c69",
+        "startBlock": 15590585,
+        "chain": "optimism-sepolia"
+      },
+      {
+        "abi": "LD-Base",
+        "address": "0xa4e91145fd2370eca42186b9614ae3df398832cd",
+        "startBlock": 13660172,
+        "chain": "base-sepolia"
+      }
+    ]
+  }
+  

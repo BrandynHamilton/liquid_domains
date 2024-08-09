@@ -146,13 +146,17 @@ def create_app():
     # Load models
     global prophet_model, ridge_model, randomforest_model, cumulative_sales_chart, ma_plot, sold_domains_fig, rolling_avg_plot, combined_dataset
 
+    X, y, prophet_features, gen_features, target, combined_dataset, features = process_data()
+
     prophet_model = joblib.load('prophet_model.pkl')
     ridge_model = joblib.load('ridge_model.pkl')
     randomforest_model = joblib.load('randomforest_model.pkl')
 
-    X, y, prophet_features, gen_features, target, combined_dataset, features = process_data()
+    @app.route('/update_data')
+    def update_data():
+        X, y, prophet_features, gen_features, target, combined_dataset, features = process_data()
+        return X, y, prophet_features, gen_features, target, combined_dataset, features
     # cumulative_sales_chart, ma_plot, sold_domains_fig, rolling_avg_plot = create_visualizations(combined_dataset)
-
 
     @app.route('/')
     def index():
@@ -182,7 +186,7 @@ def create_app():
     @app.route('/api/visualizations', methods=['GET'])
     def visualizations():
         global combined_dataset
-        time_frame = request.args.get('time_frame', 'all')  # Default to 'all' if not provided
+        time_frame = request.args.get('time_frame', '7d')  # Default to 'all' if not provided
         print(f'timeframe {time_frame}')
         print(f'combined_data: {combined_dataset}')
         filtered_charts = create_visualizations(combined_dataset, time_frame)

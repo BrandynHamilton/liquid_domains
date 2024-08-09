@@ -65,3 +65,20 @@ base_domain_sales = """
       AND event_type = 'sale'
 
 """
+
+eth_price = """
+
+  select
+    hour as dt,
+    symbol,
+    price
+  from
+    ethereum.price.ez_prices_hourly
+  where
+    symbol in('WETH', 'MATIC')
+    AND date_trunc('day', dt) >= '	2022-06-01'
+  order by
+    dt DESC
+
+
+"""
