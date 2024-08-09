@@ -5,6 +5,7 @@ node_modules/
 smart-contract-examples/
 erc_721_remix/
 notes/deployed_addresses.txt
+notes/chainlink_secrets.txt
 notes/npx_variables.txt
 metadata.db
 .env

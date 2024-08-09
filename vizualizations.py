@@ -16,23 +16,32 @@ import plotly.express as px
 
 # %%
 def filter_data_by_time_frame(dataset, time_frame):
-    end_date = dataset.index.max()
+
+    dataset_copy = dataset.copy()
+    dataset_copy['dt'] = pd.to_datetime(dataset_copy['dt'])
+    dataset_copy.set_index('dt', inplace=True)
     
-    if time_frame == '7d':
+    end_date = dataset_copy.index.max()
+    
+    if time_frame == '7_days':
         start_date = end_date - pd.DateOffset(days=7)
-    elif time_frame == '30d':
+    elif time_frame == '30_days':
         start_date = end_date - pd.DateOffset(days=30)
-    elif time_frame == '180d':
+    elif time_frame == '180_days':
         start_date = end_date - pd.DateOffset(days=180)
-    elif time_frame == '365d':
+    elif time_frame == '365_days':
         start_date = end_date - pd.DateOffset(days=365)
     else:  # 'all'
-        start_date = dataset.index.min()
+        start_date = dataset_copy.index.min()
     
-    return dataset[(dataset.index >= start_date) & (dataset.index <= end_date)]
+    new_data = dataset_copy[(dataset_copy.index >= start_date) & (dataset_copy.index <= end_date)]
+
+    print(f'filtered domain data: {new_data}')
+    
+    return new_data
 
 
-def create_visualizations(data, time_frame='all'):
+def create_visualizations(data, time_frame):
     print(f'data: {data}')
     # %%
     data = filter_data_by_time_frame(data, time_frame)
@@ -49,7 +58,7 @@ def create_visualizations(data, time_frame='all'):
 
     # %%
     # viz_data.index = pd.to_datetime(viz_data.index)
-    viz_data.set_index('dt', inplace=True)
+    # viz_data.set_index('dt', inplace=True)
 
     # %%
     daily_sales_vol = viz_data['price_usd'].resample('d').sum()
