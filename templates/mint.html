@@ -146,13 +146,13 @@
 </head>
 <body>
     <div class="container">
+        <a href="/">Home</a>
         <h1>⚒️ Mint a Liquid Domain</h1>
         
-        <!-- Home Link -->
-        <a href="/">Home</a>
-        
         <button id="connectWallet">Connect Wallet</button>
-        <div id="walletAddress"></div> <!-- Moved this element here -->
+        <div id="walletAddress"></div>
+        <div id="networkId"></div> <!-- Added this element to display the network ID -->
+        <div id="networkName"></div> <!-- Added this element to display the network name -->
 
         <!-- Portfolio and domain information -->
         <h2>Total Portfolio Value</h2>
@@ -177,12 +177,41 @@
         let web3;
         let accounts;
 
+        // Network ID to name mapping
+        const networkNames = {
+            1: 'Ethereum Mainnet',
+            3: 'Ropsten Testnet',
+            4: 'Rinkeby Testnet',
+            5: 'Goerli Testnet',
+            42: 'Kovan Testnet',
+            11155420: 'Optimism Sepolia',
+            84532: 'base-sepolia',
+            43114: 'Avalanche C-Chain',
+            44787: 'celo-dango',
+            128: 'Huobi Eco-Chain',
+            80001: 'Polygon Mumbai Testnet',
+            420: 'Optimism Goerli Testnet',
+            43113: 'Avalanche Fuji Testnet',
+            919: 'mode-sepolia',
+            42161: 'Arbitrum One',
+            // Add more network IDs and names as needed
+        };
+
         document.getElementById('connectWallet').addEventListener('click', async () => {
             if (window.ethereum) {
                 try {
                     web3 = new Web3(window.ethereum);
                     accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     document.getElementById('walletAddress').innerText = 'Connected Wallet: ' + accounts[0];
+
+                    // Get and display the network ID
+                    const networkId = await web3.eth.net.getId();
+                    document.getElementById('networkId').innerText = 'Network ID: ' + networkId;
+
+                    // Translate and display the network name
+                    const networkName = networkNames[networkId] || 'Unknown Network';
+                    document.getElementById('networkName').innerText = 'Network Name: ' + networkName;
+
                     getWalletValue(accounts[0]);
                 } catch (error) {
                     console.error(error);
@@ -194,6 +223,12 @@
 
         document.getElementById('mintNFT').addEventListener('click', async () => {
             if (web3 && accounts) {
+            const networkId = await web3.eth.net.getId();
+                document.getElementById('networkId').innerText = 'Network ID: ' + networkId;
+
+                // Translate and display the network name
+                const networkName = networkNames[networkId] || 'Unknown Network';
+                
                 const uri = document.getElementById('uriInput').value;
                 if (!uri) {
                     alert('Please enter a metadata URI!');
@@ -206,21 +241,30 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ account: accounts[0], uri: uri }),
+                        body: JSON.stringify({ account: accounts[0], uri: uri, networkName: networkName}),
                     });
+
+                    // if (networkName === 'mode-sepolia') {
+                    //     explorerUrl = `https://sepolia.explorer.mode.network/tx/${data.transactionHash}`;
+                    // } else {
+                    //     // Use the general Blockscout URL format for other networks
+                    //     explorerUrl = `https://${networkName}.blockscout.com/tx/${data.transactionHash}`;
+                    // }
                     const data = await response.json();
                     const mintList = document.getElementById('mintList');
                     if (data.transactionHash) {
-                        // Create a new list item for the mint
                         const mintItem = document.createElement('li');
                         mintItem.className = 'mint-item';
                         mintItem.innerHTML = `
                             Domain: ${uri} - 
-                            Transaction Hash: <a href="https://optimism-sepolia.blockscout.com/tx/${data.transactionHash}" target="_blank">${data.transactionHash}</a>
-                            <img src="/static/img/Color_BS_symbol.png" alt="Logo">
+                            Transaction Hash: <a href="https://${networkName}.blockscout.com/tx/${data.transactionHash}" target="_blank">${data.transactionHash}</a>
+                            <img src="/static/img/Color_BS_symbol.png" alt="Logo" style="width: 25px; height: 25px;">
                         `;
+
                         mintList.appendChild(mintItem);
-                        alert(`Mint Successful: See tx on Blockscout\n\nTransaction Hash: https://optimism-sepolia.blockscout.com/tx/${data.transactionHash}`);
+
+                        // Display an alert with the transaction link
+                        alert(`Mint Successful: See tx on ${networkName}\n\nTransaction Hash: ${data.transactionHash}`);
                     } else {
                         alert('Minted successfully! Refresh page to see value.');
                     }
@@ -234,25 +278,28 @@
         });
 
         async function getWalletValue(account) {
+            
             try {
-                // Fetch domain and value information
+
+                const networkId = await web3.eth.net.getId();
+                const networkName = networkNames[networkId] || 'Unknown Network';
+
                 const response = await fetch('/api/domain_values', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ account: account }),
+                    body: JSON.stringify({ account: account, networkName: networkName }),
                 });
                 const data = await response.json();
                 
                 document.getElementById('portfolioValue').innerText = 'Total Portfolio Value: ' + data.totalValue;
 
-                // Display domain values
                 const domainValuesElement = document.getElementById('domainValues');
                 domainValuesElement.innerHTML = '';
                 data.domains.forEach(domainInfo => {
                     const div = document.createElement('div');
-                    div.innerText = 'Domain: ' + domainInfo.domain + ', Value: ' + domainInfo.value;
+                    div.innerText = 'Domain: ' + domainInfo.domain + ', Value: ' + domainInfo.value + ', Network: ' + networkName;
                     domainValuesElement.appendChild(div);
                 });
 

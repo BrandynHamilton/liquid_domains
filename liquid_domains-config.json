@@ -3,10 +3,10 @@
     "name": "liquiddomains",
     "abis": {
       "LD-Optimism": {
-        "path": "./consumer-abi.json"
+        "path": ".abi/consumer-abi.json"
       },
       "LD-Base": {
-        "path": "./consumer-abi.json"
+        "path": ".abi/consumer-abi.json"
       }
     },
     "instances": [

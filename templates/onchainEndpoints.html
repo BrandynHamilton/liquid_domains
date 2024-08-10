@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏴 Endpoints</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1000px;
+            margin-top: 20px;
+        }
+        .container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .container button:hover {
+            background-color: #0056b3;
+        }
+        .container .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .chart-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        .chart-container .chart {
+            background-color: #fff;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            padding: 10px;
+            width: 100%; /* Use the full width for charts */
+        }
+        select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .api-links {
+            margin-top: 20px;
+        }
+        .api-links a {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .api-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Contracts</h1>
+        <div class="api-links"> 
+            <a href="https://sepolia-optimism.etherscan.io/address/0x3e6f168587f9721a31f2fa1a560e6ab36d3b8c69" target="_blank">OP Sepolia Chainlink Consumer</a>
+            <a href="https://base-sepolia.blockscout.com/address/0xA4e91145Fd2370ECa42186B9614Ae3dF398832cd" target="_blank">Base Sepolia Chainlink Consumer</a>
+        </div>  
+        <h1>API Endpoints</h1>
+        <div class="api-links"> 
+            <a href="https://api.goldsky.com/api/public/project_clzm4w84tloct01stccgyf543/subgraphs/name-optimism-sepolia/version/gn" target="_blank">OP Sepolia Chainlink Consumer - Goldsky Endpoint</a>
+            <a href="https://api.goldsky.com/api/public/project_clzm4w84tloct01stccgyf543/subgraphs/name-base-sepolia/version/gn" target="_blank">Base Sepolia Chainlink Consumer - Goldsky Endpoint</a>
+            <a href="https://www.optimizerfinance.com/api/evaluate" target="_blank">Valuation Endpoinot</a>
+
+            <!-- Add more endpoints here as needed -->
+        </div>
+    </div>
+</body>
+</html>

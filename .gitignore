@@ -7,6 +7,7 @@ erc_721_remix/
 notes/deployed_addresses.txt
 notes/chainlink_secrets.txt
 notes/npx_variables.txt
+notes/goldsky_config.txt
 metadata.db
 .env
 *.pkl

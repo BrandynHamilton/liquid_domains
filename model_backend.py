@@ -79,46 +79,76 @@ ngrok.set_auth_token(ngrok_token)
 public_url = ngrok.connect(5555, pyngrok_config=pyngrok_config, hostname="www.optimizerfinance.com").public_url
 print("ngrok public URL:", public_url)
 
-# Initialize Web3
-w3 = Web3(Web3.HTTPProvider('https://optimism-sepolia.infura.io/v3/22b286f565734e3e80221a4212adc370'))
-print(f'Web3 provider URL: {w3.provider.endpoint_uri}')
+def network(chain='optimism-sepolia'):
+    if chain == 'base-sepolia':
+        w3 = Web3(Web3.HTTPProvider(f'https://{chain}.g.alchemy.com/v2/6AUlaGmWe505S7gRPZXVh4YEFgJdYHy5'))
+    elif chain =='celo-dango':
+        w3 = Web3(Web3.HTTPProvider(f'https://forno.dango.celo-testnet.org/'))
+    elif chain =='mode-sepolia':
+        w3 = Web3(Web3.HTTPProvider(f'https://sepolia.mode.network/'))
+    else:
+        w3 = Web3(Web3.HTTPProvider(f'https://{chain}.infura.io/v3/22b286f565734e3e80221a4212adc370'))
 
-# Check if the connection is working
-try:
-    latest_block = w3.eth.get_block('latest')
-    print(f'Latest block number: {latest_block["number"]}')
-except Exception as e:
-    print(f'Error fetching latest block: {str(e)}')
+    print(f'Web3 provider URL: {w3.provider.endpoint_uri}')
 
-# print(f'Web3 version: {w3.__version__}')
+    try:
+        latest_block = w3.eth.get_block('latest')
+        print(f'Latest block number: {latest_block["number"]}')
+    except Exception as e:
+        print(f'Error fetching latest block: {str(e)}')
+
+    if chain == 'base-sepolia':
+        contract_address = '0x571d1bd9F88Cd5cf8ae3d72Ca5fA06D593490869'
+    elif chain == 'mode-sepolia':
+        contract_address = '0x3E6f168587f9721A31f2FA1a560e6ab36d3B8c69'
+    elif chain == 'celo-dango': 
+        contract_address = '0x3E6f168587f9721A31f2FA1a560e6ab36d3B8c69'
+    else:
+        contract_address = '0x26dd9e35C36249907D6F63C1424BC2a44898600b'
+    return w3, contract_address
+
+w3, contract_address = network()
+    
+# # Initialize Web3
+# w3 = Web3(Web3.HTTPProvider('https://optimism-sepolia.infura.io/v3/22b286f565734e3e80221a4212adc370'))
+# print(f'Web3 provider URL: {w3.provider.endpoint_uri}')
+
+# # Check if the connection is working
+# try:
+#     latest_block = w3.eth.get_block('latest')
+#     print(f'Latest block number: {latest_block["number"]}')
+# except Exception as e:
+#     print(f'Error fetching latest block: {str(e)}')
+
+# # print(f'Web3 version: {w3.__version__}')
 
 # Load contract ABI and address
-with open('liquid-domains-abi.json') as f:
-    contract_abi = json.load(f)
-    print(f'Contract ABI loaded: {contract_abi}')
+# with open('liquid-domains-abi.json') as f:
+#     contract_abi = json.load(f)
+#     print(f'Contract ABI loaded: {contract_abi}')
 
-contract_address = '0x26dd9e35C36249907D6F63C1424BC2a44898600b'
-print(f'Contract address: {contract_address}')
+# # contract_address = '0x26dd9e35C36249907D6F63C1424BC2a44898600b'
+# print(f'Contract address: {contract_address}')
 
-# Initialize the contract
-try:
-    contract = w3.eth.contract(address=contract_address, abi=contract_abi)
-    print('Contract initialized successfully.')
-except Exception as e:
-    print(f'Error initializing contract: {str(e)}')
+# # Initialize the contract
+# try:
+#     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+#     print('Contract initialized successfully.')
+# except Exception as e:
+#     print(f'Error initializing contract: {str(e)}')
 
-# Get the private key and create an account
+# # Get the private key and create an account
 private_key = os.getenv('DEPLOYER_PRIVATE_KEY')
 account = Account.from_key(private_key)
 
-# Extract address and convert to checksum address
+# # Extract address and convert to checksum address
 account_address = account.address
 account_checksum = Web3.to_checksum_address(account_address)
 
-# Set the default account for Web3
+# # Set the default account for Web3
 w3.eth.default_account = account_checksum
 
-# Add middleware for signing and sending transactions
+# # Add middleware for signing and sending transactions
 w3.middleware_onion.add(construct_sign_and_send_raw_middleware(account))
 
 print(f"Your hot wallet address is {account_address}")
@@ -211,7 +241,7 @@ def create_app():
         data = request.get_json()
         domain = data.get('domain')
         api_key = data.get('api_key')  # Get API key from request body
-
+    
         # Check if the API key matches
         if api_key != API_KEY:
             return jsonify({'error': 'Unauthorized'}), 401
@@ -255,29 +285,46 @@ def create_app():
     @app.route('/mint')
     def mint():
             return render_template('mint.html')
+    
+    @app.route('/endpoints')
+    def endpoints():
+            return render_template('onchainEndpoints.html')
 
     @app.route('/api/mint', methods=['POST'])
     def api_mint():
         data = request.get_json()
-        account = data.get('account')
+        user_account = data.get('account')
         uri = data.get('uri')  # URI for metadata
+        network_name = data.get('networkName')  # Network parameter
 
         # Log the received data
-        print(f'Received data: account={account}, uri={uri}')
+        print(f'Received data: account={account}, uri={uri}, network={network_name}')
 
         # Validate input data
-        if not account or not uri:
-            return jsonify({"error": "Account address and URI are required"}), 400
+        if not account or not uri or not network_name:
+            return jsonify({"error": "Account address, URI, and network are required"}), 400
         
-        account_checksum = Web3.to_checksum_address(account)
-
         # Convert account address to checksum format
+        user_account_checksum = Web3.to_checksum_address(user_account)
+
         try:
-            # Get the latest nonce
+            # Get Web3 provider and contract address for the selected network
+            w3, contract_address = network(network_name)
+
+            # Load the contract ABI (assuming this is already loaded)
+            with open('liquid-domains-abi.json') as f:
+                contract_abi = json.load(f)
+            
+            # Initialize the contract with the correct address and ABI
+            contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+
+            w3.eth.default_account = account_checksum
+            
+            # Get the latest nonce for the account
             nonce = w3.eth.get_transaction_count(w3.eth.default_account)
 
             # Build the transaction
-            tx = contract.functions.safeMint(account_checksum, uri).build_transaction({
+            tx = contract.functions.safeMint(user_account_checksum, uri).build_transaction({
                 'from': w3.eth.default_account,
                 'nonce': nonce,
                 'gas': 2000000,
@@ -285,7 +332,6 @@ def create_app():
             })
 
             # Sign the transaction
-            # private_key = 'YOUR_PRIVATE_KEY'
             signed_tx = w3.eth.account.sign_transaction(tx, private_key)
 
             # Send the transaction
@@ -305,30 +351,43 @@ def create_app():
 
 
 
+
     
     @app.route('/api/domain_values', methods=['POST'])
     def api_domain_values():
         data = request.get_json()
-        account = data.get('account')
+        user_account = data.get('account')
+        network_name = data.get('networkName')
+
+        # Load the contract ABI (assuming this is already loaded)
+        with open('liquid-domains-abi.json') as f:
+            contract_abi = json.load(f)
+
+        user_account_checksum = Web3.to_checksum_address(user_account)
+
+        w3, contract_address = network(network_name)
+        
+        # Initialize the contract with the correct address and ABI
+        contract = w3.eth.contract(address=contract_address, abi=contract_abi)
         
         if not account:
             return jsonify({'error': 'Account address is required'}), 400
 
         # Convert to checksum address
         try:
-            account_checksum = Web3.to_checksum_address(account)
+            user_account_checksum = Web3.to_checksum_address(user_account_checksum)
         except ValueError:
             return jsonify({'error': 'Invalid Ethereum address'}), 400
 
         # Fetch the number of tokens owned by the account
-        token_count = contract.functions.balanceOf(account_checksum).call()
+        token_count = contract.functions.balanceOf(user_account_checksum).call()
         
         domain_values = []
         total_value = 0
 
         for index in range(token_count):
             # Retrieve token ID(s)
-            token_id = contract.functions.tokenOfOwnerByIndex(account_checksum, index).call()
+            token_id = contract.functions.tokenOfOwnerByIndex(user_account_checksum, index).call()
 
             # Retrieve the metadata URI for the token
             metadata_uri = contract.functions.tokenURI(token_id).call()
