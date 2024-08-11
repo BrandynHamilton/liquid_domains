@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛓️ Onchain Domain Valuation</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1000px;
+            margin-top: 20px;
+        }
+        .container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .container a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .container a:hover {
+            text-decoration: underline;
+        }
+        .container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px; /* Add margin to space out the button from the text input */
+        }
+        .container button:hover {
+            background-color: #0056b3;
+        }
+        .container .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .container .chart-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        .container .chart-container .chart {
+            background-color: #fff;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            padding: 10px;
+            width: 100%; /* Use the full width for charts */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #mints {
+            margin-top: 20px;
+        }
+        .mint-item {
+            margin-bottom: 10px;
+        }
+        .mint-item a {
+            text-decoration: none;
+            color: blue;
+        }
+        .mint-item a:hover {
+            text-decoration: underline;
+        }
+        .mint-item img {
+            width: 20px; /* Adjust size as needed */
+            height: 20px;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+
+    /* Styles for the custom alert modal */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .horizontal-menu {
+            list-style-type: none; /* Remove bullet points */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            display: flex; /* Display items in a row */
+        }
+
+        .horizontal-menu li {
+            margin-right: 15px; /* Optional: Add space between items */
+        }
+
+        .horizontal-menu li:last-child {
+            margin-right: 0; /* Remove space after the last item */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <ul class="horizontal-menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/mint">Mint</a></li>
+            <li><a href="/onchainval">Onchain Valuation</a></li>
+            <li><a href="/endpoints">Deployed Contracts & Endpoints</a></li>
+        </ul>
+        <h1>⛓️ Onchain Domain Valuation</h1>
+        <form id="domain-form">
+            <input type="text" id="domain" placeholder="Enter domain name" required />
+            <select id="network" required>
+                <option value="" disabled selected>Select network</option>
+                <option value="optimism-sepolia">Optimism Sepolia</option>
+                <option value="base-sepolia">Base Sepolia</option>
+            </select>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="response"></div>
+        <h2>📊 Visualizations</h2>
+        <div class="chart-container">
+            <div class="chart" id="op-sepolia-chart"></div>
+            <div class="chart" id="base-sepolia-chart"></div>
+        </div>
+    </div>
+    <script>
+        function fetchCharts() {
+            fetch('/endpoint_visualizations')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Data fetched from API:', data);  // Log the fetched data
+
+                    // Plotting charts
+                    Plotly.newPlot('op-sepolia-chart', JSON.parse(data['op-sepolia_fig']).data, JSON.parse(data['op-sepolia_fig']).layout);
+                    Plotly.newPlot('base-sepolia-chart', JSON.parse(data['base-sepolia_fig']).data, JSON.parse(data['base-sepolia_fig']).layout);
+                })
+                .catch(error => {
+                    console.error('Error fetching charts:', error);
+                });
+        }
+
+        // Fetch charts when the page loads
+        window.onload = () => {
+            fetchCharts();
+        };
+    </script>
+
+    <script>
+        document.getElementById('domain-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const domain = document.getElementById('domain').value;
+            const network = document.getElementById('network').value;
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = 'Submitting...';
+
+            try {
+                const res = await fetch('/api/request-domain', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ domain, network })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    responseDiv.innerHTML = `
+                        Request sent! <br>
+                        Transaction hash: <a href="${data.explorerUrl}" target="_blank">${data.txHash}</a> <br>
+                        Status: ${data.status} <br>
+                        Fulfillment cost: ${data.cost} LINK <br>
+                        Decoded response: ${data.decodedResponse ? JSON.stringify(data.decodedResponse) : 'No response'} <br>
+                    `;
+                } else {
+                    responseDiv.innerHTML = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                responseDiv.innerHTML = 'Failed to send request.';
+            }
+        });
+    </script>
+</body>
+</html>

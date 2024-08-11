@@ -102,23 +102,54 @@
         .api-links a:hover {
             text-decoration: underline;
         }
+        .horizontal-menu {
+            list-style-type: none; /* Remove bullet points */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            display: flex; /* Display items in a row */
+        }
+        .horizontal-menu li {
+            margin-right: 15px; /* Optional: Add space between items */
+        }
+        .horizontal-menu li:last-child {
+            margin-right: 0; /* Remove space after the last item */
+        }
     </style>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Contracts</h1>
-        <div class="api-links"> 
-            <a href="https://sepolia-optimism.etherscan.io/address/0x3e6f168587f9721a31f2fa1a560e6ab36d3b8c69" target="_blank">OP Sepolia Chainlink Consumer</a>
-            <a href="https://base-sepolia.blockscout.com/address/0xA4e91145Fd2370ECa42186B9614Ae3dF398832cd" target="_blank">Base Sepolia Chainlink Consumer</a>
-        </div>  
-        <h1>API Endpoints</h1>
+        <ul class="horizontal-menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/mint">Mint</a></li>
+            <li><a href="/onchainval">Onchain Valuation</a></li>
+            <li><a href="/endpoints">Deployed Contracts & Endpoints</a></li>
+        </ul>
+        <h1>🔗 API Endpoints</h1>
         <div class="api-links"> 
             <a href="https://api.goldsky.com/api/public/project_clzm4w84tloct01stccgyf543/subgraphs/name-optimism-sepolia/version/gn" target="_blank">OP Sepolia Chainlink Consumer - Goldsky Endpoint</a>
             <a href="https://api.goldsky.com/api/public/project_clzm4w84tloct01stccgyf543/subgraphs/name-base-sepolia/version/gn" target="_blank">Base Sepolia Chainlink Consumer - Goldsky Endpoint</a>
-            <a href="https://www.optimizerfinance.com/api/evaluate" target="_blank">Valuation Endpoinot</a>
-
-            <!-- Add more endpoints here as needed -->
+            <a href="https://www.optimizerfinance.com/api/evaluate" target="_blank">Valuation Endpoint</a>
+        </div>
+        <h1>📜 Contracts</h1>
+        <h2>Optimism Sepolia</h2>
+        <div class="api-links"> 
+            <a href="https://optimism-sepolia.blockscout.com/address/0x3E6f168587f9721A31f2FA1a560e6ab36d3B8c69" target="_blank">OP Sepolia Chainlink Consumer</a>
+            <a href="https://optimism-sepolia.blockscout.com/address/0x35686511f74190b39683f4eb6a35231674a580b1" target="_blank">OP Sepolia Chainlink Node</a>
+            <a href="https://optimism-sepolia.blockscout.com/address/0x26dd9e35C36249907D6F63C1424BC2a44898600b" target="_blank">OP Sepolia LD NFTs</a>
+        </div>
+        <h2>Base Sepolia</h2>
+        <div class="api-links"> 
+            <a href="https://base-sepolia.blockscout.com/address/0xA4e91145Fd2370ECa42186B9614Ae3dF398832cd" target="_blank">Base Sepolia Chainlink Consumer</a>
+            <a href="https://base-sepolia.blockscout.com/address/0x571d1bd9F88Cd5cf8ae3d72Ca5fA06D593490869" target="_blank">Base Sepolia LD NFTs</a>
+        </div>
+        <h2>Mode Sepolia</h2>
+        <div class="api-links"> 
+            <a href="https://sepolia.explorer.mode.network/token/0x3E6f168587f9721A31f2FA1a560e6ab36d3B8c69" target="_blank">Mode Sepolia LD NFTs</a>
+        </div>
+        <h2>Celo Dango</h2>
+        <div class="api-links"> 
+            <a href="https://celo-dango.blockscout.com/token/0x3E6f168587f9721A31f2FA1a560e6ab36d3B8c69" target="_blank">Celo Dango LD NFTs</a>
         </div>
     </div>
 </body>

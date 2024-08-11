@@ -1,9 +1,0 @@
-goldsky subgraph deploy name/version --from-abi E:\Projects\liquid_domains\liquid_domains-config.json
-
-apikey=clzm5sfzln40t01v2e8cx46fe
-
-  Subgraphs generated, deploying to your goldsky project
-|
-o  Deployed subgraph API: https://api.goldsky.com/api/public/project_clzm4w84tloct01stccgyf543/subgraphs/name-base-sepolia/version/gn
-|
-o  Deployed subgraph API: https://api.goldsky.com/api/public/project_clzm4w84tloct01stccgyf543/subgraphs/name-optimism-sepolia/version/gn

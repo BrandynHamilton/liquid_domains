@@ -89,12 +89,32 @@
         th {
             background-color: #f2f2f2;
         }
+        .horizontal-menu {
+            list-style-type: none; /* Remove bullet points */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+            display: flex; /* Display items in a row */
+        }
+
+        .horizontal-menu li {
+            margin-right: 15px; /* Optional: Add space between items */
+        }
+
+        .horizontal-menu li:last-child {
+            margin-right: 0; /* Remove space after the last item */
+        }
+
     </style>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <a href="/mint">Mint</a>
+        <ul class="horizontal-menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/mint">Mint</a></li>
+            <li><a href="/onchainval">Onchain Valuation</a></li>
+            <li><a href="/endpoints">Deployed Contracts & Endpoints</a></li>
+        </ul>
         <h1>🌐 Liquid Domains</h1>
         <input type="text" id="domain" placeholder="Enter domain name">
         <button onclick="evaluateDomain()">Evaluate</button>
@@ -132,6 +152,18 @@
     </div>
 
     <script>
+        function formatCurrency(value) {
+            // Convert value to a number
+            const numberValue = parseFloat(value);
+
+            // Check if conversion is successful
+            if (isNaN(numberValue)) {
+                return value; // Return the original value if it's not a number
+            }
+
+            // Format the number as currency with comma separators
+            return `$${numberValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
         function evaluateDomain() {
             const domain = document.getElementById('domain').value;
             const apiKey = 'superhack2024';  // Your API key
@@ -149,7 +181,7 @@
                 if (data.error) {
                     resultDiv.textContent = data.error;
                 } else {
-                    resultDiv.textContent = `Domain: ${data.domain} - Value: ${data.value}`;
+                    resultDiv.textContent = `Domain: ${data.domain} - Value: ${formatCurrency(data.value)}`;
                 }
             })
             .catch(error => {
@@ -193,7 +225,7 @@
                         tr.innerHTML = `
                             <td>${row.dt}</td>
                             <td>${row.domain}</td>
-                            <td>${row.value}</td>
+                            <td>${formatCurrency(row.value)}</td>
                         `;
                         tableBody.appendChild(tr);
                     });

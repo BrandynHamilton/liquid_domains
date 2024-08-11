@@ -102,7 +102,7 @@ def create_visualizations(data, time_frame):
         go.Scatter(
             x=daily_sales_aggregate.index,
             y=daily_sales_aggregate['cumulative_sum_sales_volume'],
-            name='cumulative_sum_sales_volume',
+            name='Cumulative Sales Volume',
             stackgroup='one'
         ),
         secondary_y=False
@@ -112,24 +112,38 @@ def create_visualizations(data, time_frame):
         go.Scatter(
             x=daily_sales_aggregate.index,
             y=daily_sales_aggregate['cumulative_sales'],
-            name='cumulative_sales',
+            name='Cumulative Sales',
             mode='lines'
         ),
         secondary_y=True
     )
+    
 
     cumulative_sales_chart.update_layout(
         title='Cumulative Sales Volume',
-        # barmode='group'  # Set the bar mode to either 'group' for side-by-side or 'stack' for stacked
+        legend=dict(yanchor="top", y=1.1, xanchor="left", x=0.01,orientation="h",bgcolor='rgba(0,0,0,0)'),
+        yaxis=dict(tickmode='array',  # Use this to set specific ticks
+        tickprefix='$')
+              
     )
 
-    cumulative_sales_chart.update_xaxes(title_text="Date")
+    # cumulative_sales_chart.update_xaxes(title_text="Date")
 
     # cumulative_sales_chart.show()
 
     # %%
     def sales_7_30(start=None, end=None):
         test_fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+        test_fig.add_trace(
+            go.Scatter(
+                x=daily_sales_aggregate.index,
+                y=daily_sales_aggregate['30d_sales_volume'],
+                name='30d Sales Volume',
+                stackgroup='one'
+            ),
+            secondary_y=False
+        )
             
         test_fig.add_trace(
             go.Scatter(
@@ -140,21 +154,15 @@ def create_visualizations(data, time_frame):
             ),
             secondary_y=False
         )
-        test_fig.add_trace(
-            go.Scatter(
-                x=daily_sales_aggregate.index,
-                y=daily_sales_aggregate['30d_sales_volume'],
-                name='30d Sales Volume',
-                stackgroup='one'
-            ),
-            secondary_y=False
-        )
+        
         test_fig.update_layout(
             title='7d and 30d Sales Volume',
-            # barmode='group'  # Set the bar mode to either 'group' for side-by-side or 'stack' for stacked
+            legend=dict(yanchor="top", y=1.1, xanchor="left", x=0.01,orientation="h",bgcolor='rgba(0,0,0,0)'),
+            yaxis=dict(tickmode='array',  # Use this to set specific ticks
+            tickprefix='$')
         )
 
-        test_fig.update_xaxes(title_text="Date")
+        # test_fig.update_xaxes(title_text="Date")
 
         return test_fig
 
@@ -258,31 +266,33 @@ def create_visualizations(data, time_frame):
     # %%
 
     sold_domains_fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    sold_domains_fig.add_trace(
+        go.Scatter(
+            x=daily_sales_aggregate.index,
+            y=daily_sales_aggregate['30d_domains_sold'],
+            name='30d Domains Sold',
+            stackgroup='one'
+        ),
+        secondary_y=False
+    )
         
     sold_domains_fig.add_trace(
         go.Scatter(
             x=daily_sales_aggregate.index,
             y=daily_sales_aggregate['7d_domains_sold'],
-            name='7d domains sold',
+            name='7d Domains Sold',
             stackgroup='one'
         ),
         secondary_y=False
     )
-    sold_domains_fig.add_trace(
-        go.Scatter(
-            x=daily_sales_aggregate.index,
-            y=daily_sales_aggregate['30d_domains_sold'],
-            name='30d domains sold',
-            stackgroup='one'
-        ),
-        secondary_y=False
-    )
+    
     sold_domains_fig.update_layout(
-        title='7d and 30d # of Domains Sold',
-        # barmode='group'  # Set the bar mode to either 'group' for side-by-side or 'stack' for stacked
-    )
+        title='7d and 30d Number of Domains Sold',
+        legend=dict(yanchor="top", y=1.1, xanchor="left", x=0.01,orientation="h",bgcolor='rgba(0,0,0,0)')
+        )
 
-    sold_domains_fig.update_xaxes(title_text="Date")
+    # sold_domains_fig.update_xaxes(title_text="Date")
 
 
 
@@ -365,31 +375,35 @@ def create_visualizations(data, time_frame):
     # %%
     def rolling_avg_plot(df):
         rolling_avg_plot = make_subplots(specs=[[{"secondary_y": True}]])
+
+        rolling_avg_plot.add_trace(
+            go.Scatter(
+                x=df.index,
+                y=df['30d_rolling_avg_price'],
+                name='30d Rolling Average Price',
+                stackgroup='one'
+            ),
+            secondary_y=False
+        )
             
         rolling_avg_plot.add_trace(
             go.Scatter(
                 x=df.index,
                 y=df['7d_rolling_avg_price'],
-                name='7d rolling avg price',
+                name='7d Rolling Average Price',
                 stackgroup='one'
             ),
             secondary_y=False
         )
-        rolling_avg_plot.add_trace(
-            go.Scatter(
-                x=df.index,
-                y=df['30d_rolling_avg_price'],
-                name='30d rolling avg price',
-                stackgroup='one'
-            ),
-            secondary_y=False
-        )
+        
         rolling_avg_plot.update_layout(
-            title='7d and 30d rolling avg prices',
-            # barmode='group'  # Set the bar mode to either 'group' for side-by-side or 'stack' for stacked
+            title='7d and 30d Rolling Average Prices',
+            legend=dict(yanchor="top", y=1.1, xanchor="left", x=0.01,orientation="h",bgcolor='rgba(0,0,0,0)'),
+            yaxis=dict(tickmode='array',  # Use this to set specific ticks
+            tickprefix='$')
         )
 
-        rolling_avg_plot.update_xaxes(title_text="Date")
+        # rolling_avg_plot.update_xaxes(title_text="Date")
         return rolling_avg_plot
 
     

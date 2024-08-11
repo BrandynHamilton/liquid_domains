@@ -31,9 +31,9 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 
 from scripts.utils import flipside_api_results, set_random_seed
 from scripts.data_processing import process_data
-from models.forecasters import EnsemblePredictor, Prophet_Domain_Valuator, Domain_Valuator, train_ridge_model, train_randomforest_model, train_prophet_model
+from forecasters import EnsemblePredictor, Prophet_Domain_Valuator, Domain_Valuator, train_ridge_model, train_randomforest_model, train_prophet_model
 
-from vizualizations import create_visualizations
+from liquid_domains.scripts.vizualizations import create_visualizations
 
 pd.options.display.float_format = '{:,.2f}'.format
 

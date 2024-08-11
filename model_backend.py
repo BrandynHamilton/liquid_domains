@@ -32,7 +32,8 @@ from scripts.utils import flipside_api_results, set_random_seed
 from scripts.data_processing import process_data
 from models.forecasters import EnsemblePredictor, Prophet_Domain_Valuator, Domain_Valuator, train_ridge_model, train_randomforest_model, train_prophet_model
 
-from vizualizations import create_visualizations
+from scripts.vizualizations import create_visualizations
+from scripts.blockscout_visualizations import blockscout
 
 from pyngrok import ngrok, conf, installer
 import ssl
@@ -87,7 +88,7 @@ def network(chain='optimism-sepolia'):
     elif chain =='mode-sepolia':
         w3 = Web3(Web3.HTTPProvider(f'https://sepolia.mode.network/'))
     else:
-        w3 = Web3(Web3.HTTPProvider(f'https://{chain}.infura.io/v3/22b286f565734e3e80221a4212adc370'))
+        w3 = Web3(Web3.HTTPProvider(f'https://optimism-sepolia.infura.io/v3/22b286f565734e3e80221a4212adc370'))
 
     print(f'Web3 provider URL: {w3.provider.endpoint_uri}')
 
@@ -171,6 +172,7 @@ def create_app():
     cache = Cache('cache_dir')
 
     global historical_data
+    historical_data = pd.DataFrame()
     historical_data = cache.get('historical_data', pd.DataFrame())
 
     # Load models
@@ -231,6 +233,7 @@ def create_app():
     @app.route('/api/historical_data')
     def get_historical_data():
         global historical_data
+        historical_data = pd.DataFrame()
         historical_data = cache.get('historical_data', pd.DataFrame())
         print(f'historical data at get historical_data: {historical_data}')
         historical_data_json = historical_data.to_dict(orient='records')
@@ -240,11 +243,6 @@ def create_app():
     def evaluate():
         data = request.get_json()
         domain = data.get('domain')
-        api_key = data.get('api_key')  # Get API key from request body
-    
-        # Check if the API key matches
-        if api_key != API_KEY:
-            return jsonify({'error': 'Unauthorized'}), 401
         
         # Check if the domain is provided
         if not domain:
@@ -255,6 +253,7 @@ def create_app():
         
         # Record the current time and update historical data
         today = dt.datetime.now()
+        # value = f"${value:,.2f}"
         value_info = {
             "dt": today,
             "domain": domain,
@@ -265,12 +264,43 @@ def create_app():
         
         # Return the domain value
         return jsonify({'domain': domain, 'value': value})
+
+    @app.route('/onchainval')
+    def onchain_val():
+        return render_template('onchain_valuation.html')
+    
+    @app.route("/api/request-domain", methods=["POST"])
+    def proxy_request():
+        data = request.json
+        domain = data.get("domain")
+        network = data.get("network")
+
+        if not domain:
+            return jsonify({"error": "Domain is required"}), 400
+        
+        if not network:
+            return jsonify({"error": "Network is required"}), 400
+        
+        # Proxy the request to the Node.js server
+        try:
+            response = requests.post("http://localhost:3000/api/request-domain", json={"domain": domain, "network": network})
+            response.raise_for_status()  # Raise an error for bad HTTP status codes
+            return jsonify(response.json()), response.status_code
+        except requests.RequestException as e:
+            # Handle errors in the request to the Node.js server
+            print(f"Request error: {e}")
+            return jsonify({"error": "Failed to proxy request"}), 500
     
     @app.route('/api/latest_valuations', methods=['GET'])
     def latest_valuations():
         global historical_data
+        historical_data = pd.DataFrame()
         historical_data = cache.get('historical_data', pd.DataFrame())
-        latest_valuations = historical_data.head(10)  # Get the last 10 rows
+        latest_valuations = historical_data.head(10) 
+
+        # for record in latest_valuations:
+        #     record['Value'] = f"${record['Value']:.2f}" # Get the last 10 rows
+        # latest_valuations['Value'] = latest_valuations['Value'].apply(lambda x: f"${x:,.2f}")
         latest_valuations_json = latest_valuations.to_dict(orient='records')
         return jsonify(latest_valuations_json)
 
@@ -289,6 +319,16 @@ def create_app():
     @app.route('/endpoints')
     def endpoints():
             return render_template('onchainEndpoints.html')
+    
+    @app.route('/endpoint_visualizations')
+    def endpoints_charts():
+        filtered_charts = blockscout()
+        cached_data = {
+            "op-sepolia_fig": filtered_charts[0],
+            "base-sepolia_fig": filtered_charts[1],
+        }
+        return jsonify(cached_data)
+        
 
     @app.route('/api/mint', methods=['POST'])
     def api_mint():
@@ -350,7 +390,7 @@ def create_app():
             return jsonify({"error": str(e)}), 400
 
 
-
+    
 
     
     @app.route('/api/domain_values', methods=['POST'])
@@ -400,6 +440,9 @@ def create_app():
                 value = get_domain_value(domain_name)
                 domain_values.append({'domain': domain_name, 'value': value})
                 total_value += value
+
+        # # Format the total value after the loop
+        # formatted_total_value = f"${total_value:,.2f}"
 
         return jsonify({'domains': domain_values, 'totalValue': total_value})
 
