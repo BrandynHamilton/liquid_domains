@@ -5,6 +5,6 @@
 
 ## Directories
 
-- 'contracts': contains the .sol contracts used to deploy onchain.
-- 'models': contains the models used to generate the price feeds.
-- 'scripts': contains data retrieval, data processing, and helper functions.
+- contracts: contains the .sol contracts used to deploy onchain.
+- models: contains the models used to generate the price feeds.
+- scripts: contains data retrieval, data processing, and helper functions.
