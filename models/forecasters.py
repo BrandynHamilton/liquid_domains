@@ -53,7 +53,7 @@ class EnsemblePredictor:
         })
 
         # Aggregate predictions (you can use mean, median, or other methods)
-        predictions['ensemble'] = predictions.mean(axis=1)
+        predictions['ensemble'] = predictions.median(axis=1)
         
         return predictions['ensemble']
     
@@ -203,7 +203,13 @@ def train_ridge_model(X, y, features, seed):
     print(f'MSE: {mse}')
     print(f'R²: {r2}')
 
-    return pipeline, features 
+    metrics = {
+        "r2":r2,
+        "mae":mae,
+        "mse":mse
+    }
+
+    return pipeline, features, metrics
 
 
 
@@ -239,7 +245,13 @@ def train_randomforest_model(X, y, features, seed):
     print(f'MSE: {mse}')
     print(f'R²: {r2}')
 
-    return pipeline, features 
+    metrics = {
+        "r2":r2,
+        "mae":mae,
+        "mse":mse
+    }
+
+    return pipeline, features , metrics
 
 # %%
 def train_prophet_model(features, combined_dataset, seed):
@@ -277,4 +289,10 @@ def train_prophet_model(features, combined_dataset, seed):
     print(f"MAE: {mae}")
     print(f"RMSE: {rmse}")
 
-    return model, features
+    metrics = {
+        "r2":r2,
+        "mae":mae,
+        "rmse":rmse
+    }
+
+    return model, features, metrics

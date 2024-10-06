@@ -138,8 +138,8 @@ def create_visualizations(data, time_frame):
         test_fig.add_trace(
             go.Scatter(
                 x=daily_sales_aggregate.index,
-                y=daily_sales_aggregate['30d_sales_volume'],
-                name='30d Sales Volume',
+                y=daily_sales_aggregate['7d_sales_volume'],
+                name='7d Sales Volume',
                 stackgroup='one'
             ),
             secondary_y=False
@@ -148,8 +148,8 @@ def create_visualizations(data, time_frame):
         test_fig.add_trace(
             go.Scatter(
                 x=daily_sales_aggregate.index,
-                y=daily_sales_aggregate['7d_sales_volume'],
-                name='7d Sales Volume',
+                y=daily_sales_aggregate['30d_sales_volume'],
+                name='30d Sales Volume',
                 stackgroup='one'
             ),
             secondary_y=False
@@ -270,8 +270,8 @@ def create_visualizations(data, time_frame):
     sold_domains_fig.add_trace(
         go.Scatter(
             x=daily_sales_aggregate.index,
-            y=daily_sales_aggregate['30d_domains_sold'],
-            name='30d Domains Sold',
+            y=daily_sales_aggregate['7d_domains_sold'],
+            name='7d Domains Sold',
             stackgroup='one'
         ),
         secondary_y=False
@@ -280,8 +280,8 @@ def create_visualizations(data, time_frame):
     sold_domains_fig.add_trace(
         go.Scatter(
             x=daily_sales_aggregate.index,
-            y=daily_sales_aggregate['7d_domains_sold'],
-            name='7d Domains Sold',
+            y=daily_sales_aggregate['30d_domains_sold'],
+            name='30d Domains Sold',
             stackgroup='one'
         ),
         secondary_y=False
@@ -379,8 +379,8 @@ def create_visualizations(data, time_frame):
         rolling_avg_plot.add_trace(
             go.Scatter(
                 x=df.index,
-                y=df['30d_rolling_avg_price'],
-                name='30d Rolling Average Price',
+                y=df['7d_rolling_avg_price'],
+                name='7d Rolling Average Price',
                 stackgroup='one'
             ),
             secondary_y=False
@@ -389,8 +389,8 @@ def create_visualizations(data, time_frame):
         rolling_avg_plot.add_trace(
             go.Scatter(
                 x=df.index,
-                y=df['7d_rolling_avg_price'],
-                name='7d Rolling Average Price',
+                y=df['30d_rolling_avg_price'],
+                name='30d Rolling Average Price',
                 stackgroup='one'
             ),
             secondary_y=False

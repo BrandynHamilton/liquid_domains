@@ -45,10 +45,7 @@ from eth_account.signers.local import LocalAccount
 from web3 import Web3, EthereumTesterProvider
 from web3.middleware import construct_sign_and_send_raw_middleware
 
-
 pd.options.display.float_format = '{:,.2f}'.format
-
-
 
 # Create a default SSL context that bypasses certificate verification
 context = ssl.create_default_context()
@@ -509,7 +506,7 @@ def main(domain, prophet_model, ridge_model, randomforest_model, combined_datase
         randomforest_domain_value
     ]
 
-    ensemble_domain_value = np.mean(individual_predictions)
+    ensemble_domain_value = np.median(individual_predictions)
     print(f'individual valuations: {individual_predictions}')
     print(f'ensamble value: {ensemble_domain_value}')
 
